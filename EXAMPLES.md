@@ -251,7 +251,7 @@ POST /nodes
         },
         {
             "id": "eb17b279d87c46c090dec77564d28ebf",
-            "parent": ea846905f2a146c0acdfb48b4b79ff4a
+            "parent": "ea846905f2a146c0acdfb48b4b79ff4a"
         }
     ]
 }
@@ -288,3 +288,86 @@ status 400
 ```
 {"error": "Loop relations not allowed"}
 ```
+
+Example of tree with multiple roots:
+
+POST /nodes with body
+```
+{
+    "nodes": [
+        {
+            "id": "e12afca2cc0c4d6fb2a27119010f1e20",
+            "parent": "a0378f4f37c5492091918f53b4da15a5"
+        },
+        {
+            "id": "e12afca2cc0c4d6fb2a27119010f1e20",
+            "parent": "c592ff8d473a4924bcd5655ae1c6ffd5"
+        }
+    ]
+}
+```
+![simple graph](images/multi_root.png)
+
+and GET /trees/e12afca2cc0c4d6fb2a27119010f1e20 return 
+
+```
+{
+    "trees": [
+        ["a0378f4f37c5492091918f53b4da15a5", "e12afca2cc0c4d6fb2a27119010f1e20"],
+        ["c592ff8d473a4924bcd5655ae1c6ffd5", "e12afca2cc0c4d6fb2a27119010f1e20"]
+    ]
+}
+```
+
+Lets add more nodes
+
+
+POST /nodes with body
+```
+{
+    "nodes": [
+        {
+            "id": "C90A70BD-23D0-4E8A-BA61-518745390EA5",
+            "parent": "e12afca2cc0c4d6fb2a27119010f1e20"
+        },
+        {
+            "id": "D483616F-2A54-497E-96B1-1DE919677000",
+            "parent": "e12afca2cc0c4d6fb2a27119010f1e20"
+        },
+         {
+            "id": "final",
+            "parent": "C90A70BD-23D0-4E8A-BA61-518745390EA5"
+        },
+        {
+            "id": "final",
+            "parent": "D483616F-2A54-497E-96B1-1DE919677000"
+        }
+    ]
+}
+```
+
+![simple graph](images/multi_comlex_tree.png)
+
+and GET /trees/final return 
+
+```
+{
+    "trees": [
+        ["a0378f4f37c5492091918f53b4da15a5", "e12afca2cc0c4d6fb2a27119010f1e20", "C90A70BD-23D0-4E8A-BA61-518745390EA5", "final"],
+        ["c592ff8d473a4924bcd5655ae1c6ffd5", "e12afca2cc0c4d6fb2a27119010f1e20", "C90A70BD-23D0-4E8A-BA61-518745390EA5", "final"],
+        ["a0378f4f37c5492091918f53b4da15a5", "e12afca2cc0c4d6fb2a27119010f1e20", "D483616F-2A54-497E-96B1-1DE919677000", "final"],
+        ["c592ff8d473a4924bcd5655ae1c6ffd5", "e12afca2cc0c4d6fb2a27119010f1e20", "D483616F-2A54-497E-96B1-1DE919677000", "final"]
+    ]
+}
+```
+
+
+but and GET /trees/a0378f4f37c5492091918f53b4da15a5 return only 
+
+```
+{
+    "trees": [
+        ["a0378f4f37c5492091918f53b4da15a5", "e12afca2cc0c4d6fb2a27119010f1e20", "C90A70BD-23D0-4E8A-BA61-518745390EA5", "final"],
+        ["a0378f4f37c5492091918f53b4da15a5", "e12afca2cc0c4d6fb2a27119010f1e20", "D483616F-2A54-497E-96B1-1DE919677000", "final"]
+    ]
+}
