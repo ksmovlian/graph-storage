@@ -1,18 +1,25 @@
 from flask import Flask, request, jsonify
 from graph_storage import GraphStorage
+from node_view_model import NodesArray
+from marshmallow import ValidationError
+
 
 app = Flask(__name__)
 graph_storage = GraphStorage()
+nodes_list_schema = NodesArray()
 
 
 @app.route('/nodes', methods=['POST'])
-def hello_world():
+def insert_nodes_list():
     request_json = request.get_json()
-    requested_nodes_list = request_json.get('nodes')
-    if requested_nodes_list is None:
-        return jsonify({'error': 'No nodes sent in the request'}), 400
 
-    cyclic_nodes_skipped = graph_storage.add_nodes(requested_nodes_list)
+    try:
+        requested_nodes_list = nodes_list_schema.load(request_json)
+        print(requested_nodes_list)
+    except ValidationError as err:
+        return jsonify({'errors': err.messages}), 400
+
+    cyclic_nodes_skipped = graph_storage.add_nodes(requested_nodes_list.get('nodes'))
     if len(cyclic_nodes_skipped) > 0:
         return jsonify({'error': 'Loop relations are not allowed'}), 400
 
